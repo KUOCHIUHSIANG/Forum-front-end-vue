@@ -7,8 +7,14 @@
       <!-- 餐廳卡片 RestaurantCard-->
       <RestaurantCard v-for="restaurant in restaurants" :key="restaurant.id" :initial-restaurant="restaurant" />
     </div>
-
     <!-- 分頁標籤 RestaurantPagination -->
+    <RestaurantPagination 
+      :current-page="currentPage"
+      :total-page="totalPage"
+      :category-id="categoryId"
+      :previous-page="previousPage"
+      :next-page="nextPage"
+    />
   </div>
 </template>
 
@@ -16,6 +22,7 @@
 import NavTabs from '../components/NavTabs.vue'
 import RestaurantCard from '../components/RestaurantCard.vue'
 import RestaurantsNavPills from '../components/RestaurantsNavPills.vue'
+import RestaurantPagination from '../components/RestaurantsPagination.vue'
 
 const dummyData = {
     "restaurants": [
@@ -291,7 +298,8 @@ export default {
   components: {
     NavTabs,
     RestaurantCard,
-    RestaurantsNavPills
+    RestaurantsNavPills,
+    RestaurantPagination
   },
   data() {
     return{
