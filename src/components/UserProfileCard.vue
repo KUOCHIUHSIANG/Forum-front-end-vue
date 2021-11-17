@@ -23,8 +23,8 @@
               ><button type="submit" class="btn btn-primary">edit</button></a
             >
             <template v-else>
-              <button v-if="!isFollowed" @click="addFollow" type="submit" class="btn btn-primary">追蹤</button>
-              <button v-else @click="deleteFollow" type="submit" class="btn btn-danger">取消追蹤</button>
+              <button v-if="isFollowed" @click="deleteFollow" type="submit" class="btn btn-danger">取消追蹤</button>
+              <button v-else @click="addFollow" type="submit" class="btn btn-primary">追蹤</button>
             </template>
           </p>
         </div>
