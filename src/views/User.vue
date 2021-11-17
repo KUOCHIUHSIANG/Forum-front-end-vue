@@ -2,7 +2,7 @@
 <div class="album py-5 bg-light">
   <div class="container">
     <!-- UserProfileCard -->
-    <UserProfileCard :initial-profile="profile" :initial-isFollowed="isFollowed"/>
+    <UserProfileCard :initial-profile="profile" :initial-isFollowed="isFollowed" />
     <div class="row">
       <div class="col-md-4">
         <!-- UserFollowingsCard -->
@@ -16,6 +16,7 @@
         <UserCommentsCard :comments="profile.Comments" />
         <br />
         <!-- UserFavoritedRestaurantsCard -->
+        <UserFavoritedRestaurantsCard :favoritedRestaurants="profile.FavoritedRestaurants" />
       </div>
     </div>
   </div>
@@ -27,6 +28,7 @@ import UserProfileCard from '../components/UserProfileCard.vue'
 import UserFollowingsCard from '../components/UserFollowingsCard.vue'
 import UserFollowersCard from '../components/UserFollowersCard.vue'
 import UserCommentsCard from '../components/UserCommentsCard.vue'
+import UserFavoritedRestaurantsCard from '../components/UserFavoritedRestaurantsCard.vue'
 
 const dummyData = {
   profile: {
@@ -1291,7 +1293,8 @@ export default {
     UserProfileCard,
     UserFollowingsCard,
     UserFollowersCard,
-    UserCommentsCard
+    UserCommentsCard,
+    UserFavoritedRestaurantsCard
   },
   data() {
     return {
