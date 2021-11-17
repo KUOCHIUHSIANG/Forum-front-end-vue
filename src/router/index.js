@@ -34,7 +34,7 @@ const routes = [
   },
   {
     path: '/restaurants/top',
-    name: 'restaurants-tops',
+    name: 'restaurants-top',
     component: () => import('../views/RestaurantsTop.vue')
   },
   {
