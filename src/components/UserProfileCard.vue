@@ -3,7 +3,7 @@
     <div class="row no-gutters">
       <div class="col-md-4">
         <img
-          :src="profile.image"
+          :src="profile.image | checkImage"
           width="300px"
           height="300px"
         />
@@ -34,6 +34,8 @@
 </template>
 
 <script>
+import { emptyUserFilter } from '../utils/mixins'
+
 const dummyUser = {
   currentUser: {
     id: 1,
@@ -46,6 +48,7 @@ const dummyUser = {
 }
 
 export default {
+  mixins: [emptyUserFilter],
   props: {
     initialProfile: {
       type: Object,
