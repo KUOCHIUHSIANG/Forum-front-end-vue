@@ -146,6 +146,24 @@ const dummyData = {
 export default {
   created() {
     this.fetchCategories()
+    this.restaurant = {
+      ...this.restaurant,
+      ...this.initialRestaurant
+    }
+  },
+  props: {
+    initialRestaurant: {
+      type: Object,
+      default: () => ({
+        name: '',
+        categoryId: '',
+        tel: '',
+        address: '',
+        description: '',
+        image: '',
+        openingHours: '',
+      })
+    }
   },
   data() {
     return {
@@ -167,6 +185,7 @@ export default {
     },
     handleFileChange(e) {
       const { files } = e.target
+      console.log(files)
       if (files.length === 0) {
         this.restaurant.image = ''
       } else {
