@@ -19,8 +19,8 @@
             <li><strong> {{ profile.Followers.length }} </strong> followers (追隨者)</li>
           </ul>
           <p>
-            <a v-if="currentUser.id === profile.id" href="/users/2/edit"
-              ><button type="submit" class="btn btn-primary">edit</button></a
+            <router-link v-if="currentUser.id === profile.id" :to="{name: 'user-edit', params: profile.id}"
+              ><button type="submit" class="btn btn-primary">edit</button></router-link
             >
             <template v-else>
               <button v-if="isFollowed" @click="deleteFollow" type="submit" class="btn btn-danger">取消追蹤</button>
