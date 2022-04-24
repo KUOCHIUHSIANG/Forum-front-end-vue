@@ -2,9 +2,7 @@
   <div class="container py-5">
     <form class="w-100" v-on:submit.prevent.stop="handleSubmit">
       <div class="text-center mb-4">
-        <h1 class="h3 mb-3 font-weight-normal">
-          Sign In
-        </h1>
+        <h1 class="h3 mb-3 font-weight-normal">Sign In</h1>
       </div>
 
       <div class="form-label-group mb-2">
@@ -19,7 +17,7 @@
           autocomplete="username"
           required
           autofocus
-        >
+        />
       </div>
 
       <div class="form-label-group mb-3">
@@ -33,7 +31,7 @@
           placeholder="Password"
           autocomplete="current-password"
           required
-        >
+        />
       </div>
 
       <button
@@ -46,61 +44,67 @@
 
       <div class="text-center mb-3">
         <p>
-          <router-link to="/signup">
-          Sign Up
-          </router-link>
+          <router-link to="/signup"> Sign Up </router-link>
         </p>
       </div>
 
-      <p class="mt-5 mb-3 text-muted text-center">
-        &copy; 2017-2018
-      </p>
+      <p class="mt-5 mb-3 text-muted text-center">&copy; 2017-2018</p>
     </form>
   </div>
 </template>
 
 <script>
-import authorizationAPI from '../apis/authorization'
-import { Toast } from '../utils/helpers'
+import authorizationAPI from "../apis/authorization";
+import { Toast } from "../utils/helpers";
 
 export default {
   data() {
     return {
-      email: '',
-      password: '',
+      email: "",
+      password: "",
       isProcessing: false,
-    }
+    };
   },
   methods: {
-    handleSubmit() {
-      if(!this.email || !this.password) {
-        Toast.fire({
-          icon: 'warning',
-          title: '請填入 email 和 password'
-        })
-        return
-      }
-      this.isProcessing = true
-      authorizationAPI.signIn({
-        email: this.email,
-        password: this.password
-      }).then(response => {
-        const { data } = response
-        if(data.status !== 'success') {
-          throw new Error(data.message)
+    async handleSubmit() {
+      try {
+        if (!this.email || !this.password) {
+          Toast.fire({
+            icon: "warning",
+            title: "請填入 email 和 password",
+          });
+          return;
         }
-        localStorage.setItem('token', data.token)
-        this.$router.push('/restaurants')
-      }).catch(error => {
-        this.isProcessing = false
-        this.password = ''
+
+        this.isProcessing = true;
+
+        const response = await authorizationAPI.signIn({
+          email: this.email,
+          password: this.password,
+        });
+
+        const { data } = response;
+
+        if (data.status !== "success") {
+          throw new Error(data.message);
+        }
+
+        localStorage.setItem("token", data.token);
+
+        this.$router.push("/restaurants");
+      } catch (error) {
+
+        this.isProcessing = false;
+        this.password = "";
+
         Toast.fire({
-          icon: 'warning',
-          title: '請確認您輸入了正確的帳號密碼'
-        })
-        console.log( 'error ', error)
-      })
-    }
-  }
-}
+          icon: "warning",
+          title: "請確認您輸入了正確的帳號密碼",
+        });
+
+        console.log("error ", error);
+      }
+    },
+  },
+};
 </script>
