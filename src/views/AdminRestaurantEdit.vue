@@ -1,34 +1,16 @@
 <template>
   <div class="container py-5">
-    <AdminRestaurantForm :initial-restaurant="restaurant" @after-submit="handleAfterSubmit" />
+    <AdminRestaurantForm :initial-restaurant="restaurant" 
+    :is-processing="isProcessing"
+    @after-submit="handleAfterSubmit" />
   </div>
 </template>
 
 <script>
 import AdminRestaurantForm from "./../components/AdminRestaurantForm.vue";
+import adminAPI from './../apis/admin'
+import { Toast } from './../utils/helpers'
 
-const dummyData = {
-  restaurant: {
-    id: 1,
-    name: "Bulah Schumm",
-    tel: "(436) 018-0374 x61925",
-    address: "6586 Abernathy Curve",
-    opening_hours: "08:00",
-    description: "ut ex rerum",
-    image:
-      "https://loremflickr.com/320/240/restaurant,food/?random=31.390253654065248",
-    viewCounts: 1,
-    createdAt: "2021-11-10T08:18:00.000Z",
-    updatedAt: "2021-11-13T06:35:44.000Z",
-    CategoryId: 1,
-    Category: {
-      id: 1,
-      name: "中式料理",
-      createdAt: "2021-11-10T08:18:00.000Z",
-      updatedAt: "2021-11-10T08:18:00.000Z",
-    },
-  },
-};
 
 export default {
   created() {
@@ -50,30 +32,71 @@ export default {
         image: "",
         openingHours: "",
       },
+      isProcessing: false
     };
   },
   methods: {
-    fetchRestaurant(restaurantId) {
-      console.log('fetchRestaurant id: ', restaurantId)
-      const { restaurant } = dummyData
-      this.restaurant = {
-        ...this.restaurant,
-        id: restaurant.id,
-        name: restaurant.name,
-        categoryId: restaurant.CategoryId,
-        tel: restaurant.tel,
-        address: restaurant.address,
-        description: restaurant.description,
-        image: restaurant.image,
-        openingHours: restaurant.opening_hours
+    async fetchRestaurant(restaurantId) {
+      try {
+        const { data } = await adminAPI.restaurants.getDetail({ restaurantId })
+        
+        const {
+          id,
+          name,
+          tel,
+          address,
+          opening_hours: openingHours,
+          description,
+          image,
+          CategoryId: categoryId
+        } = data.restaurant
+        this.restaurant = {
+          ...this.restaurant,
+          id,
+          name,
+          tel,
+          address,
+          openingHours,
+          description,
+          image,
+          categoryId
+        }
+      } catch (error) {
+        Toast.fire({
+          icon: 'error',
+          title: '無法取得餐廳資料，請稍後再試'
+        })
+        console.log('error', error);
       }
     },
-    handleAfterSubmit(formData) {
+    async handleAfterSubmit(formData) {
       // 透過 API 將表單資料送到伺服器
-      for (let [name, value] of formData.entries()) {
-        console.log(name + ": " + value);
+      try {
+        this.isProcessing = true
+        const { data } = await adminAPI.restaurants.update({
+          restaurantId: this.restaurant.id,
+          formData
+        })
+
+        if(data.status !== 'success') {
+          throw new Error(data.message)
+        }
+
+        this.$router.push({ name: 'admin-restaurants' })
+      } catch (error) {
+        this.isProcessing = false
+        Toast.fire({
+          icon: 'error',
+          title: '無法更新餐廳資料，請稍後再試'
+        })
+        console.log('error', error)
       }
     },
   },
+  beforeRouteUpdate(to, from, next) {
+    const { id } = to.params
+    this.fetchRestaurant(id)
+    next()
+  }
 };
 </script>
