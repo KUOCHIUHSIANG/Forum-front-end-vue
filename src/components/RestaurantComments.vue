@@ -31,17 +31,10 @@
 
 <script>
 import { fromNowFilter } from '../utils/mixins'
+import restaurantsAPI from './../apis/restaurants'
+import { Toast } from './../utils/helpers'
+import { mapState } from 'vuex'
 
-const dummyUser = {
-  currentUser: {
-    id: 1,
-    name: '管理者',
-    email: 'root@example.com',
-    image: 'https://i.pravatar.cc/300',
-    isAdmin: true
-  },
-  isAuthenticated: true
-}
 
 export default {
   props: {
@@ -51,20 +44,33 @@ export default {
     }
   },
   mixins: [fromNowFilter],
-  data() {
-    return {
-      currentUser: dummyUser.currentUser
+  methods: {
+    async handleDeleteButtonClick(commentId) {
+      const checkDelete = confirm('確定要刪除此評論嗎？')
+
+      if(!checkDelete) {
+        return
+      } else {
+        try {
+          const { data } = await restaurantsAPI.deleteComment({ commentId })
+
+          if(data.status !== 'success') {
+            throw new Error(data.message)
+          }
+          // 觸發父層事件 - $emit('事件名稱', 傳遞的資料)
+          this.$emit('after-delete-comment', commentId)
+        } catch (error) {
+          console.log('error', error);
+          Toast.fire({
+            icon: 'error',
+            title: '無法刪除評論，請稍後再試'
+          })
+        }
+      }
     }
   },
-  methods: {
-    handleDeleteButtonClick(commentId) {
-      console.log('handleDeleteButtonClick', commentId)
-
-      //TODO: 請求 API 伺服器刪除 id 為 commentId 的評論
-
-      // 觸發父層事件 - $emit('事件名稱', 傳遞的資料)
-      this.$emit('after-delete-comment', commentId)
-    }
+  computed: {
+    ...mapState(['currentUser','isAuthenticated'])
   }
 }
 </script>
