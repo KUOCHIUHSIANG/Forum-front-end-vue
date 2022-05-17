@@ -19,12 +19,12 @@
             <li><strong> {{ profile.Followers.length }} </strong> followers (追隨者)</li>
           </ul>
           <p>
-            <router-link v-if="currentUser.id === profile.id" :to="{name: 'user-edit', params: profile.id}"
+            <router-link v-if="isCurrentUser" :to="{name: 'user-edit', params: profile.id}"
               ><button type="submit" class="btn btn-primary">edit</button></router-link
             >
             <template v-else>
-              <button v-if="isFollowed" @click="deleteFollow" type="submit" class="btn btn-danger">取消追蹤</button>
-              <button v-else @click="addFollow" type="submit" class="btn btn-primary">追蹤</button>
+              <button v-if="isFollowed" @click="deleteFollow(profile.id)" type="submit" class="btn btn-danger">取消追蹤</button>
+              <button v-else @click="addFollow(profile.id)" type="submit" class="btn btn-primary">追蹤</button>
             </template>
           </p>
         </div>
@@ -35,43 +35,73 @@
 
 <script>
 import { emptyUserFilter } from '../utils/mixins'
-
-const dummyUser = {
-  currentUser: {
-    id: 1,
-    name: '管理者',
-    email: 'root@example.com',
-    image: 'https://i.pravatar.cc/300',
-    isAdmin: true
-  },
-  isAuthenticated: true
-}
+import usersAPI from './../apis/users'
+import { Toast } from './../utils/helpers'
 
 export default {
   mixins: [emptyUserFilter],
   props: {
-    initialProfile: {
+    profile: {
       type: Object,
       required: true
     },
     initialIsFollowed: {
       type: Boolean,
-      required: true // 拿掉就不會出現 Missing required prop的問題
+      required: true,
+    },
+    isCurrentUser: {
+      type: Boolean,
+      required: true
     }
   },
   data() {
     return {
-      profile: this.initialProfile,
       isFollowed: this.initialIsFollowed,
-      currentUser: dummyUser.currentUser
     }
   },
   methods: {
-    addFollow() {
-      this.isFollowed = true
+    async addFollow(profileId) {
+      try {
+        const { data } = await usersAPI.addFollowing({ 
+          userId: profileId
+        })
+        
+        if(data.status !== 'success') {
+          throw new Error(data.message)
+        }
+
+        this.isFollowed = true
+      } catch (error) {
+        console.log('error', error);
+        Toast.fire({
+          icon: 'error',
+          title: '無法追蹤，請稍後再試'
+        })
+      }
     },
-    deleteFollow() {
-      this.isFollowed = false
+    async deleteFollow(profileId) {
+      try {
+        const { data } = await usersAPI.deleteFollowing({ 
+          userId: profileId
+        })
+
+        if(data.status !== 'success') {
+          throw new Error(data.message)
+        }
+
+        this.isFollowed = false
+      } catch (error) {
+        console.log('error', error);
+        Toast.fire({
+          icon: 'error',
+          title: '無法取消追蹤，請稍後再試'
+        })
+      }
+    }
+  },
+  watch: {
+    initialIsFollowed(isFollowed) {
+      this.isFollowed = isFollowed
     }
   }
 }
