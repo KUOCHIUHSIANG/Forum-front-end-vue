@@ -15,9 +15,9 @@
         <tr v-for="user in users" :key="user.id">
           <th scope="row">{{ user.id }}</th>
           <td>{{ user.email }}</td>
-          <td>{{ user.isAdmin | renderAdmin('role') }}</td>
+          <td>{{ user.isAdmin ? "admin" : "user" }}</td>
           <td>
-            <button v-if=" currentUser.id !== user.id && currentUser.isAdmin " @click="toggleUserRole(user.id)" type="button" class="btn btn-link">{{ user.isAdmin | renderAdmin('action') }}</button>
+            <button v-if=" currentUser.id !== user.id && currentUser.isAdmin " @click="toggleUserRole(user.id)" type="button" class="btn btn-link">{{ user.isAdmin ? "set as user" : "set as admin" }}</button>
           </td>
         </tr>
       </tbody>
@@ -27,6 +27,8 @@
 
 <script>
 import AdminNav from '../components/AdminNav.vue'
+import adminAPI from './../apis/admin'
+import { Toast } from './../utils/helpers'
 
 const dummyUsers = {
   currentUser: {
@@ -37,38 +39,6 @@ const dummyUsers = {
     isAdmin: true
   },
   isAuthenticated: true,
-  users: [
-    {
-      "id": 1,
-      "name": "root",
-      "email": "root@example.com",
-      "password": "$2a$10$vEMn/13hstMM3LFiHVlHrelX0iYsn1/IBX8nDgftLcvoocj9h7rfq",
-      "isAdmin": true,
-      "image": null,
-      "createdAt": "2021-11-10T08:18:00.000Z",
-      "updatedAt": "2021-11-10T08:18:00.000Z"
-    },
-    {
-      "id": 2,
-      "name": "user1",
-      "email": "user1@example.com",
-      "password": "$2a$10$F/51ajI/72crcWFNCTLdleAlm51gnrBmTYkxsRhDmh2AVw7TaiXxK",
-      "isAdmin": false,
-      "image": null,
-      "createdAt": "2021-11-10T08:18:00.000Z",
-      "updatedAt": "2021-11-10T08:18:00.000Z"
-    },
-    {
-      "id": 3,
-      "name": "user2",
-      "email": "user2@example.com",
-      "password": "$2a$10$qFlU7osqmyJPIF0tMN9Dq.gLt3CoPYVJod71ch1EmSkzk4zSZI53i",
-      "isAdmin": false,
-      "image": null,
-      "createdAt": "2021-11-10T08:18:00.000Z",
-      "updatedAt": "2021-11-10T08:18:00.000Z"
-    }
-  ]
 }
     
 export default {
@@ -85,12 +55,26 @@ export default {
     }
   },
   methods: {
-    fetchUsers() {
-      this.users = dummyUsers.users.map(user => {
-        return {
-          ...user
+    async fetchUsers() {
+      try {
+        const { data, statusText} = await adminAPI.users.get()
+
+        if(statusText !== 'OK') {
+          throw new Error(statusText)
         }
-      })
+
+        this.users = data.users.map(user => {
+          return {
+            ...user
+          }
+        })
+      } catch (error) {
+        console.log('error', error);
+        Toast.fire({
+          icon: 'error',
+          title: '無法取得使用者，請稍後再試'
+        })
+      }
     },
     toggleUserRole(userId) {
       this.users = this.users.map(user => {
@@ -103,15 +87,6 @@ export default {
           return user
         }
       })
-    }
-  },
-  filters: {
-    renderAdmin(bool, title) {
-      if(title === 'role') {
-        return bool ? "admin" : "user"
-      } else if(title === 'action') {
-        return bool ? "set as user" : "set as admin"
-      }
     }
   }
 }
