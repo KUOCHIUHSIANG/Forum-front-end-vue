@@ -49,10 +49,10 @@ export default {
   methods: {
     async fetchUsers() {
       try {
-        const { data, statusText} = await adminAPI.users.get()
-
-        if(statusText !== 'OK') {
-          throw new Error(statusText)
+        const { data } = await adminAPI.users.get()
+        
+        if(data.status == 'error') {
+          throw new Error(data.message)
         }
 
         this.users = data.users

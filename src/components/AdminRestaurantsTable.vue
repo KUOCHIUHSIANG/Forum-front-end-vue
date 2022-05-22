@@ -70,6 +70,11 @@ export default {
     async fetchRestaurants () {
       try {
         const { data } = await adminAPI.restaurants.get()
+        
+        if(data.status == 'error') {
+          throw new Error(data.message)
+        }
+
         this.restaurants = data.restaurants
       } catch (error) {
           Toast.fire({
