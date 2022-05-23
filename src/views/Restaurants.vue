@@ -1,58 +1,67 @@
 <template>
   <div class="container py-5">
     <NavTabs />
-    <!-- 餐廳類別標籤 RestaurantsNavPills -->
-    <RestaurantsNavPills :categories="categories" />
-    <div class="row">
-      <!-- 餐廳卡片 RestaurantCard-->
-      <RestaurantCard v-for="restaurant in restaurants" :key="restaurant.id" :initial-restaurant="restaurant" />
-    </div>
-    <!-- 分頁標籤 RestaurantPagination -->
-    <RestaurantPagination 
-      v-if="totalPage.length > 1"
-      :current-page="currentPage"
-      :total-page="totalPage"
-      :category-id="categoryId"
-      :previous-page="previousPage"
-      :next-page="nextPage"
-    />
+    <Spinner v-if="isLoading" />
+    <template v-else>
+      <!-- 餐廳類別標籤 RestaurantsNavPills -->
+      <RestaurantsNavPills :categories="categories" />
+      <div class="row">
+        <!-- 餐廳卡片 RestaurantCard-->
+        <RestaurantCard
+          v-for="restaurant in restaurants"
+          :key="restaurant.id"
+          :initial-restaurant="restaurant"
+        />
+      </div>
+      <!-- 分頁標籤 RestaurantPagination -->
+      <RestaurantPagination
+        v-if="totalPage.length > 1"
+        :current-page="currentPage"
+        :total-page="totalPage"
+        :category-id="categoryId"
+        :previous-page="previousPage"
+        :next-page="nextPage"
+      />
+    </template>
   </div>
 </template>
 
 <script>
-import NavTabs from '../components/NavTabs.vue'
-import RestaurantCard from '../components/RestaurantCard.vue'
-import RestaurantsNavPills from '../components/RestaurantsNavPills.vue'
-import RestaurantPagination from '../components/RestaurantsPagination.vue'
-import restaurantsAPI from '../apis/restaurants'
-import { Toast } from './../utils/helpers'
-
+import NavTabs from "../components/NavTabs.vue";
+import RestaurantCard from "../components/RestaurantCard.vue";
+import RestaurantsNavPills from "../components/RestaurantsNavPills.vue";
+import RestaurantPagination from "../components/RestaurantsPagination.vue";
+import Spinner from "../components/Spinner.vue";
+import restaurantsAPI from "../apis/restaurants";
+import { Toast } from "./../utils/helpers";
 
 export default {
   components: {
     NavTabs,
     RestaurantCard,
     RestaurantsNavPills,
-    RestaurantPagination
+    RestaurantPagination,
+    Spinner,
   },
   data() {
-    return{
+    return {
       restaurants: [],
       categories: [],
       categoryId: -1,
       currentPage: 1,
       totalPage: [],
       previousPage: -1,
-      nextPage: -1
-    }
+      nextPage: -1,
+      isLoading: true,
+    };
   },
   methods: {
-    async fetchRestaurants ({ queryPage, queryCategoryId }) {
+    async fetchRestaurants({ queryPage, queryCategoryId }) {
       try {
         const response = await restaurantsAPI.getRestaurants({
           page: queryPage,
-          categoryId: queryCategoryId
-        })
+          categoryId: queryCategoryId,
+        });
 
         // STEP 2：透過解構賦值，將所需要的資料從 response.data 取出
         const {
@@ -62,35 +71,37 @@ export default {
           page,
           totalPage,
           prev,
-          next
-        } = response.data
-        
-        // STEP 3：將從伺服器取得的 data 帶入 Vue 內
-        this.restaurants = restaurants
-        this.categories = categories
-        this.categoryId = categoryId
-        this.currentPage = page
-        this.totalPage = totalPage
-        this.previousPage = prev
-        this.nextPage = next
+          next,
+        } = response.data;
 
+        // STEP 3：將從伺服器取得的 data 帶入 Vue 內
+        this.restaurants = restaurants;
+        this.categories = categories;
+        this.categoryId = categoryId;
+        this.currentPage = page;
+        this.totalPage = totalPage;
+        this.previousPage = prev;
+        this.nextPage = next;
+
+        this.isLoading = false;
       } catch (error) {
+        this.isLoading = false;
         Toast.fire({
-          icon: 'error',
-          title: '無法取得餐廳資料，請稍後再試'
-        })
-        console.log('error', error)
+          icon: "error",
+          title: "無法取得餐廳資料，請稍後再試",
+        });
+        console.log("error", error);
       }
-    }
+    },
   },
   created() {
-    const { page = '', categoryId = '' } = this.$route.query
-    this.fetchRestaurants({ queryPage: page, queryCategoryId: categoryId })
+    const { page = "", categoryId = "" } = this.$route.query;
+    this.fetchRestaurants({ queryPage: page, queryCategoryId: categoryId });
   },
   beforeRouteUpdate(to, from, next) {
-    const { page = '', categoryId = '' } = to.query
-    this.fetchRestaurants({ queryPage: page, queryCategoryId: categoryId })
-    next()
-  }
-}
+    const { page = "", categoryId = "" } = to.query;
+    this.fetchRestaurants({ queryPage: page, queryCategoryId: categoryId });
+    next();
+  },
+};
 </script>
