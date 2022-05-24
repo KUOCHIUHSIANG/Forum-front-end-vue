@@ -19,7 +19,14 @@ https://kuochiuhsiang.github.io/forum-front-end-vue/
 | 一般使用者        |   user1@example.com   |   12345678   |
 | 一般使用者        |   user2@example.com   |   12345678   |
 
-
+## ScreenShots
+   * Restaurants Page
+   ![image](./screenshots/restaurants page.png)
+   * Users Page
+   ![image](./screenshots/user page.png)
+   * Admin Restaurants Page
+   ![image](./screenshots/admin restaurants page.png)
+   
 ## Project setup
 ```
 npm install
