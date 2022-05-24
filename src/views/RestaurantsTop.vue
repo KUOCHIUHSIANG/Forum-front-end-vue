@@ -81,7 +81,6 @@ export default {
     async fetchTopRestaurants() {
       try {
         const { data } = await restaurantsAPI.getTopRestaurants();
-        console.log(data.restaurants);
         this.restaurants = data.restaurants;
         this.isLoading = false
       } catch (error) {
