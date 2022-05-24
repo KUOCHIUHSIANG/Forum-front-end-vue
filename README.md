@@ -21,11 +21,11 @@ https://kuochiuhsiang.github.io/forum-front-end-vue/
 
 ## ScreenShots
    * Restaurants Page
-   ![image](./screenshots/restaurants page.png)
-   * Users Page
-   ![image](./screenshots/user page.png)
+   ![image](./screenshots/RestaurantsPage.png)
+   * User Page
+   ![image](./screenshots/UserPage.png)
    * Admin Restaurants Page
-   ![image](./screenshots/admin restaurants page.png)
+   ![image](./screenshots/AdminRestaurantsPage.png)
    
 ## Project setup
 ```
